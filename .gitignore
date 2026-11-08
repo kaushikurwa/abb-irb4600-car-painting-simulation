@@ -1,0 +1,27 @@
+# ROS 2 build artifacts
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Temporary and backup files
+*.bak
+*.bak*
+*~
+*.swp
+*.swo
+
+# IDE files
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Third-party vehicle meshes (not redistributed)
+src/painting_cell_description/meshes/car/

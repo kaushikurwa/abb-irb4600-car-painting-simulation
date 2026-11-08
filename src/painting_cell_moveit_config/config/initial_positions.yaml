@@ -1,0 +1,10 @@
+initial_positions:
+  joint_1: 0
+  joint_2: 0
+  joint_3: 0
+  joint_4: 0
+  joint_5: 0
+  joint_6: 0
+  rail_joint: 0
+  car_y_joint: 0
+  turntable_joint: 0

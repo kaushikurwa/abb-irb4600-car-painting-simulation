@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<robot name="painting_cell" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find painting_cell_description)/urdf/irb4600_40_255_macro.xacro"/>
+
+  <!-- ===== Layout parameters (edit these) ===== -->
+  <xacro:property name="cell_length" value="12.0"/>
+  <xacro:property name="cell_width"  value="8.0"/>
+  <xacro:property name="robot_x"     value="0.0"/>
+  <xacro:property name="robot_y"     value="-2.0"/>
+
+  <material name="cell_floor"><color rgba="0.75 0.75 0.78 1.0"/></material>
+  <material name="car_paint"><color rgba="0.55 0.58 0.62 1.0"/></material>
+
+  <link name="world"/>
+
+  <!-- Floor -->
+  <link name="floor">
+    <visual>
+      <origin xyz="0 0 -0.01" rpy="0 0 0"/>
+      <geometry><box size="${cell_length} ${cell_width} 0.02"/></geometry>
+      <material name="cell_floor"/>
+    </visual>
+  </link>
+  <joint name="world_to_floor" type="fixed">
+    <parent link="world"/><child link="floor"/>
+    <origin xyz="0 1.0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Car body: length along X, centred on the world origin, wheels at z=0 -->
+  <link name="car">
+    <visual>
+      <geometry><box size="4.9 2.2 0.04"/></geometry>
+      <material name="pallet_grey"><color rgba="0.35 0.35 0.38 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry><mesh filename="package://painting_cell_description/meshes/car/car_visual.stl"/></geometry>
+      <material name="car_paint"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="package://painting_cell_description/meshes/car/car_collision.stl"/></geometry>
+    </collision>
+  </link>
+  <!-- Car positioner: Y slide -> turntable -->
+  <xacro:property name="car_y_max"   value="1.5"/>
+
+  <link name="car_slide_y"/>
+
+  <joint name="car_y_joint" type="prismatic">
+    <parent link="world"/><child link="car_slide_y"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0.0" upper="${car_y_max}" effort="1000" velocity="0.5"/>
+  </joint>
+  <joint name="turntable_joint" type="revolute">
+    <parent link="car_slide_y"/><child link="car"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1416" upper="3.1416" effort="1000" velocity="0.5"/>
+  </joint>
+
+  <!-- Robot -->
+  <xacro:abb_irb4600_40_255 prefix=""/>
+  <!-- Linear rail along X; robot rides on the carriage (7th axis) -->
+  <xacro:property name="rail_length" value="7.4"/>
+  <xacro:property name="rail_travel" value="3.2"/>
+
+  <link name="rail">
+    <visual>
+      <origin xyz="0 0 -0.04"/>
+      <geometry><box size="${rail_length} 0.5 0.1"/></geometry>
+      <material name="rail_grey"><color rgba="0.25 0.25 0.28 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.04"/>
+      <geometry><box size="${rail_length} 0.5 0.1"/></geometry>
+    </collision>
+  </link>
+  <joint name="world_to_rail" type="fixed">
+    <parent link="world"/><child link="rail"/>
+    <origin xyz="0 ${robot_y} 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="carriage">
+    <visual>
+      <origin xyz="0 0 0.03"/>
+      <geometry><box size="1.0 0.9 0.24"/></geometry>
+      <material name="carriage_orange"><color rgba="0.9 0.45 0.05 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.03"/>
+      <geometry><box size="1.0 0.9 0.24"/></geometry>
+    </collision>
+    <!-- pedestal: lifts the robot so it can reach the roof comfortably -->
+    <visual>
+      <origin xyz="0 0 0.40"/>
+      <geometry><box size="0.8 0.8 0.50"/></geometry>
+      <material name="pedestal_grey"><color rgba="0.35 0.35 0.38 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.40"/>
+      <geometry><box size="0.8 0.8 0.50"/></geometry>
+    </collision>
+  </link>
+  <joint name="rail_joint" type="prismatic">
+    <parent link="rail"/><child link="carriage"/>
+    <origin xyz="${robot_x} 0 0.1" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="${-rail_travel}" upper="${rail_travel}" effort="1000" velocity="1.0"/>
+  </joint>
+
+  <joint name="carriage_to_robot" type="fixed">
+    <parent link="carriage"/><child link="base_link"/>
+    <origin xyz="0 0 0.65" rpy="0 0 1.5708"/>
+  </joint>
+
+
+  <!-- ===== Building walls (visual only, adapted from the reference layout) ===== -->
+  <xacro:property name="wall_t" value="0.15"/>
+  <xacro:property name="wall_h" value="3.0"/>
+  <material name="wall_mat"><color rgba="0.8 0.85 0.9 0.25"/></material>
+
+  <xacro:macro name="cell_wall" params="name x y sx sy">
+    <link name="${name}">
+      <visual>
+        <geometry><box size="${sx} ${sy} ${wall_h}"/></geometry>
+        <material name="wall_mat"/>
+      </visual>
+    </link>
+    <joint name="world_to_${name}" type="fixed">
+      <parent link="world"/><child link="${name}"/>
+      <origin xyz="${x} ${y} ${wall_h/2}" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- outer shell 12 x 8 m: y from -3 to 5 -->
+  <xacro:cell_wall name="wall_south"     x="0"  y="-3.0" sx="12"      sy="${wall_t}"/>
+  <xacro:cell_wall name="wall_north"     x="0"  y="5.0"  sx="12"      sy="${wall_t}"/>
+  <xacro:cell_wall name="wall_partition" x="0"  y="2.8"  sx="12"      sy="${wall_t}"/>
+  <!-- entry (west) / exit (east): 3 m opening, y from -1.6 to 1.4 -->
+  <xacro:cell_wall name="wall_w1" x="-6" y="-2.3" sx="${wall_t}" sy="1.4"/>
+  <xacro:cell_wall name="wall_w2" x="-6" y="3.2"  sx="${wall_t}" sy="3.6"/>
+  <xacro:cell_wall name="wall_e1" x="6"  y="-2.3" sx="${wall_t}" sy="1.4"/>
+  <xacro:cell_wall name="wall_e2" x="6"  y="3.2"  sx="${wall_t}" sy="3.6"/>
+  <!-- main painting bay 8 m long: inner walls at x = -4 and +4 -->
+  <xacro:cell_wall name="wall_iw1" x="-4" y="-2.3" sx="${wall_t}" sy="1.4"/>
+  <xacro:cell_wall name="wall_iw2" x="-4" y="2.1"  sx="${wall_t}" sy="1.4"/>
+  <xacro:cell_wall name="wall_ie1" x="4"  y="-2.3" sx="${wall_t}" sy="1.4"/>
+  <xacro:cell_wall name="wall_ie2" x="4"  y="2.1"  sx="${wall_t}" sy="1.4"/>
+  <!-- top rooms 3.0 / 2.5 / 4.0 m wide -->
+  <xacro:cell_wall name="wall_r1" x="-5.5" y="3.9" sx="${wall_t}" sy="2.2"/>
+  <xacro:cell_wall name="wall_r2" x="-2.5" y="3.9" sx="${wall_t}" sy="2.2"/>
+  <xacro:cell_wall name="wall_r3" x="0.0"  y="3.9" sx="${wall_t}" sy="2.2"/>
+  <xacro:cell_wall name="wall_r4" x="4.0"  y="3.9" sx="${wall_t}" sy="2.2"/>
+
+
+  <!-- ===== Spray gun on the robot flange (tool0). TCP z-axis = spray direction ===== -->
+  <material name="gun_body_mat"><color rgba="0.15 0.15 0.18 1.0"/></material>
+  <material name="gun_nozzle_mat"><color rgba="0.85 0.1 0.1 1.0"/></material>
+  <material name="spray_jet_mat"><color rgba="1.0 0.5 0.0 0.35"/></material>
+
+  <link name="spray_gun">
+    <visual>
+      <origin xyz="0 0 0.125" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.04" length="0.25"/></geometry>
+      <material name="gun_body_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.125" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.04" length="0.25"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0.28" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.015" length="0.06"/></geometry>
+      <material name="gun_nozzle_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.28" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.015" length="0.06"/></geometry>
+    </collision>
+  </link>
+  <joint name="tool0_to_gun" type="fixed">
+    <parent link="tool0"/><child link="spray_gun"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="paint_tcp"/>
+  <joint name="gun_to_tcp" type="fixed">
+    <parent link="spray_gun"/><child link="paint_tcp"/>
+    <origin xyz="0 0 0.31" rpy="0 0 0"/>
+  </joint>
+
+  <!-- visual-only spray jet marker, 280 mm = painting standoff -->
+  <link name="spray_jet">
+    <visual>
+      <origin xyz="0 0 0.14" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.006" length="0.28"/></geometry>
+      <material name="spray_jet_mat"/>
+    </visual>
+  </link>
+  <joint name="tcp_to_jet" type="fixed">
+    <parent link="paint_tcp"/><child link="spray_jet"/>
+  </joint>
+
+</robot>

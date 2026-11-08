@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: painting_cell_description
+    relative_path: urdf/cell.xacro
+  srdf:
+    relative_path: config/painting_cell.srdf
+  package_settings:
+    author_name: Kaushik
+    author_email: kaushikurwa@gmail.com
+    generated_timestamp: 1791373629
