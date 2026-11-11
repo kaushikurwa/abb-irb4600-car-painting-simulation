@@ -1,8 +1,8 @@
 # ABB IRB 4600 Automotive Painting Simulation
 
-A ROS 2 and MoveIt 2 based simulation of an automotive robotic painting cell using an ABB IRB 4600 industrial robot mounted on a linear rail.
+A ROS 2 and MoveIt2 based simulation of an automotive robotic painting cell using an ABB IRB 4600 industrial robot mounted on a linear rail.
 
-The system generates surface-based painting waypoints from a 3D vehicle model and executes collision-aware robot trajectories to simulate automated painting of the vehicle roof and side door.
+The system generates surface-based painting waypoints from a 3D vehicle model and executes collision-aware robot trajectories to simulate automated painting of the vehicle roof and near-side door.
 
 ## Project Overview
 
@@ -20,7 +20,7 @@ The simulation consists of:
 The simulated painting tasks include:
 1. Near-side roof painting.
 2. Far-side roof painting using turntable rotation.
-3. Side-door painting using vehicle repositioning and spray-gun reorientation.
+3. Near-side door painting using vehicle repositioning and spray-gun reorientation.
 
 ## System Architecture
 
@@ -86,7 +86,7 @@ Separate waypoint-generation procedures were developed for:
 
 - Roof surfaces.
 - Far-side roof surfaces.
-- Side-door surfaces.
+- Near-side door surfaces.
 
 A nominal spray standoff distance of 0.28 m was used.
 
@@ -135,12 +135,12 @@ The completed simulated painting workflow produced the following results:
 |---|---:|---:|
 | Near-side roof | 7 | 40 |
 | Far-side roof | 7 | 42 |
-| Side door | 4 | 54 |
+| Near-Side door | 4 | 54 |
 | **Total** | **18** | **136** |
 
 The far-side roof was accessed by rotating the vehicle approximately 180° on the turntable.
 
-The side-door painting sequence used a 1.0 m vehicle slide and a sideways spray-gun orientation.
+The Near-side door painting sequence used a 1.0 m vehicle slide and a sideways spray-gun orientation.
 
 The painting trail is a visualization of the simulated spray path. It does not represent actual paint deposition, film thickness, or industrial paint quality.
 
@@ -231,7 +231,7 @@ Far-side roof:
 python3 src/painting_cell_description/tools/paint_far.py
 ```
 
-Side-door painting:
+Near-side door painting:
 
 ```bash
 python3 src/painting_cell_description/tools/paint_side.py
@@ -261,4 +261,7 @@ All third-party models and resources remain the property of their respective cre
 
 Robotics and Artificial Intelligence Engineer
 
-GitHub: [kaushikurwa](https://github.com/kaushikurwa)
+Portfolio Website: [https://kaushikportfolio.com]
+LinkedIn: [www.linkedin.com/in/kaushik08]
+GitHub: [https://github.com/kaushikurwa]
+Email: [kaushikurwa@gmail.com]
