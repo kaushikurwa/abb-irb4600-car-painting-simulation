@@ -257,11 +257,10 @@ All third-party models and resources remain the property of their respective cre
 
 ## Author
 
-**Kaushik P**
+**Kaushik P**  
+Robotics and Artificial Intelligence Engineer  
 
-Robotics and Artificial Intelligence Engineer
-
-Portfolio Website: [https://kaushikportfolio.com]
-LinkedIn: [www.linkedin.com/in/kaushik08]
-GitHub: [https://github.com/kaushikurwa]
-Email: [kaushikurwa@gmail.com]
+Portfolio Website: [kaushikportfolio.com](https://kaushikportfolio.com)  
+LinkedIn: [linkedin.com/in/kaushik08](https://www.linkedin.com/in/kaushik08)  
+GitHub: [github.com/kaushikurwa](https://github.com/kaushikurwa)  
+Email: [kaushikurwa@gmail.com](mailto:kaushikurwa@gmail.com)
